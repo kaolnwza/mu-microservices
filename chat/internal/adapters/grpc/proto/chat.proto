@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package chat;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/kaolnwza/muniverse/chat/internal/adapters/grpc/proto/pb";
+
+message CreateChatRequest {
+  string st_user_uuid = 1;
+  string nd_user_uuid = 2;
+  string start_time = 3;
+  string end_time = 4;
+}
+
+message ChatRoomStatusRequest {
+  string horo_order_uuid = 1;
+  bool status = 2;
+}
+
+service ChatService {
+  rpc CreateChat(CreateChatRequest) returns (google.protobuf.Empty);
+  rpc UpdateChatRoomStatus(ChatRoomStatusRequest) returns (google.protobuf.Empty);
+};
+

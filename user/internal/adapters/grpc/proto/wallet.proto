@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package wallet;
+
+option go_package = "github.com/kaolnwza/muniverse/wallet/internal/adapters/grpc/proto/pb";
+
+message UserWalletRequest {
+  string user_uuid = 1;
+}
+
+message UpdateWalletRequest {
+  string user_uuid = 1;
+  int64 fund = 2;
+}
+
+message WalletResponse {
+  string user_uuid = 1;
+  int64 fund = 2;
+}
+
+message EmptyResponse {
+
+}
+
+service WalletService {
+  rpc CreateUserWallet(UserWalletRequest) returns (EmptyResponse);
+  rpc GetUserWallet(UserWalletRequest) returns (WalletResponse);
+  rpc IncreaseUserWallet(UpdateWalletRequest) returns (WalletResponse);
+  rpc DecreaseUserWallet(UpdateWalletRequest) returns (WalletResponse);
+};
+

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package storage;
+
+option go_package = "github.com/kaolnwza/muniverse/user/internal/adapters/grpc/proto/pb";
+
+message ProfileRequest {
+  string user_uuid = 1;
+}
+
+message ProfileResponse {
+  string url = 1;
+}
+
+message NewProfileRequest {
+  string user_uuid = 1;
+  string upload_uuid = 2;
+}
+
+message NewProfileResponse {
+
+}
+
+service ProfileService {
+  rpc GetProfileImage(ProfileRequest) returns (ProfileResponse);
+  rpc NewProfileImage(NewProfileRequest) returns (NewProfileResponse);
+};

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package storage;
+
+option go_package = "github.com/kaolnwza/muniverse/seer/internal/adapters/grpc/proto/pb";
+
+message ProfileRequest {
+  string user_uuid = 1;
+}
+
+message ProfileResponse {
+  string url = 1;
+}
+
+service ProfileService {
+  rpc GetProfileImage(ProfileRequest) returns (ProfileResponse);
+};
+

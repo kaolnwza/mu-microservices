@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package storage;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/kaolnwza/muniverse/order/internal/adapters/proto/pb";
+
+message ProfileRequest {
+  string user_uuid = 1;
+}
+
+message ProfileResponse {
+  string url = 1;
+}
+
+message NewHoroServiceRequest {
+  string horo_service_uuid = 1;
+  string upload_uuid = 2;
+  int32 order = 3;
+}
+
+message GetHoroServiceRequest {
+  string horo_service_uuid = 1;
+}
+
+message HoroServiceImageResponse {
+  string url = 1;
+  int32 order = 2;
+}
+
+message NewProfileRequest {
+  string user_uuid = 1;
+  string upload_uuid = 2;
+}
+
+message NewProfileResponse {
+
+}
+
+service ProfileService {
+  rpc GetProfileImage(ProfileRequest) returns (ProfileResponse);
+  rpc NewProfileImage(NewProfileRequest) returns (NewProfileResponse);
+}
+
+service HoroSvcService {
+  rpc NewHoroServiceImage(stream NewHoroServiceRequest) returns (google.protobuf.Empty);
+  rpc GetHoroServiceImage(GetHoroServiceRequest) returns (stream HoroServiceImageResponse);
+};
+
+

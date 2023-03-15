@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-test-user2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-user
+  template:
+    metadata:
+      labels:
+        app: test-user
+    spec:
+      containers:
+      - name: go-app-container
+        image: kaowasabi/test-user
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8001

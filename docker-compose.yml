@@ -1,0 +1,150 @@
+version: "3.9"
+services:
+  nginx-kub:
+    image: nginx:1.17.10
+    container_name: nginx-kub
+    depends_on:
+      - user-service
+      - storage-service
+      - order-service
+      - seer-service
+      - wallet-service
+      - voucher-service
+      - auth-service
+      - feed-service
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    networks:
+      - muniverse
+
+  user-service:
+    container_name: user-container
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    ports:
+      - 8001:8001
+      - 50052:50052
+    volumes:
+      - .:/go/app
+    env_file:
+      - user/.envrc
+      - user/deployment.env
+    networks:
+      - muniverse
+
+  order-service:
+    container_name: order-container
+    build:
+      context: ./order
+      dockerfile: Dockerfile
+    ports:
+      - 8005:8005
+      - 50054:50054
+    volumes:
+      - .:/go/app
+    env_file:
+      - order/.envrc
+      - order/deployment.env
+    networks:
+      - muniverse
+
+  seer-service:
+    container_name: seer-container
+    build:
+      context: ./seer
+      dockerfile: Dockerfile
+    ports:
+      - 8002:8002
+      - 50053:50053
+    volumes:
+      - .:/go/app
+    env_file:
+      - seer/.envrc
+      - seer/deployment.env
+    networks:
+      - muniverse
+
+  wallet-service:
+    container_name: wallet-container
+    build:
+      context: ./wallet
+      dockerfile: Dockerfile
+    ports:
+      - 8007:8007
+      - 50056:50056
+    volumes:
+      - .:/go/app
+    env_file:
+      - wallet/.envrc
+      - wallet/deployment.env
+    networks:
+      - muniverse
+
+  storage-service:
+    container_name: storage-container
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    ports:
+      - 8003:8003
+      - 50051:50051
+    volumes:
+      - .:/go/app
+    env_file:
+      - storage/.envrc
+      - storage/deployment.env
+    networks:
+      - muniverse
+
+  voucher-service:
+    container_name: voucher-container
+    build:
+      context: ./voucher
+      dockerfile: Dockerfile
+    ports:
+      - 8006:8006
+      - 50055:50055
+    volumes:
+      - .:/go/app
+    env_file:
+      - voucher/.envrc
+      - voucher/deployment.env
+    networks:
+      - muniverse
+
+  auth-service:
+    container_name: auth-container
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - 8004:8004
+    volumes:
+      - .:/go/app
+    env_file:
+      - auth/.envrc
+      - auth/deployment.env
+    networks:
+      - muniverse
+
+  feed-service:
+    container_name: feed-container
+    build:
+      context: ./feed
+      dockerfile: Dockerfile
+    ports:
+      - 8008:8008
+    volumes:
+      - .:/go/app
+    env_file:
+      - feed/.envrc
+      - feed/deployment.env
+    networks:
+      - muniverse
+
+networks:
+  muniverse:
+    external: true
