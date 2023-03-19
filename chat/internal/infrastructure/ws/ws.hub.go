@@ -1,12 +1,18 @@
 package ws
 
 import (
+	"context"
+	"errors"
+
+	"github.com/google/uuid"
 	entity "github.com/kaolnwza/muniverse/chat/internal/application/core/entities"
+	log "github.com/kaolnwza/muniverse/chat/lib/logs"
 )
 
 type wsHub struct {
 	*entity.Hub
-	cli *entity.Client
+	// cli        *entity.Client
+
 }
 
 func NewWSHub() *wsHub {
@@ -56,6 +62,17 @@ func (h *wsClient) Run() {
 
 		case m := <-h.hub.Broadcast:
 			if _, ok := h.hub.Rooms[m.RoomUUID]; ok {
+				if ok && m.Type == entity.MESSAGE_TYPE_TEXT {
+					go func(msgChan *entity.Message) {
+						roomUUID, _ := uuid.Parse(msgChan.RoomUUID)
+						userUUID, _ := uuid.Parse(msgChan.UserUUID)
+
+						if err := h.roomMsgSvc.CreateRoomMessage(context.Background(), roomUUID, userUUID, msgChan.Text); err != nil {
+							log.Error(errors.New("create message error: " + err.Error()))
+						}
+					}(m)
+				}
+
 				for _, cl := range h.hub.Rooms[m.RoomUUID].Clients {
 					cl.Message <- m
 				}

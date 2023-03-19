@@ -16,9 +16,10 @@ type horoOdrSvc struct {
 	walSvc  port.WalletService
 	seerSvc port.SeerService
 	horoSvc port.HoroService
+	chatSvc port.ChatService
 }
 
-func NewHoroOrderService(tx port.Transactor, repo port.HoroOrderRepository, vochSvc port.VoucherService, walSvc port.WalletService, horoSvc port.HoroService, seerSvc port.SeerService) port.HoroOrderService {
+func NewHoroOrderService(tx port.Transactor, repo port.HoroOrderRepository, vochSvc port.VoucherService, walSvc port.WalletService, horoSvc port.HoroService, seerSvc port.SeerService, chatSvc port.ChatService) port.HoroOrderService {
 	return &horoOdrSvc{
 		tx:      tx,
 		repo:    repo,
@@ -26,6 +27,7 @@ func NewHoroOrderService(tx port.Transactor, repo port.HoroOrderRepository, voch
 		walSvc:  walSvc,
 		horoSvc: horoSvc,
 		seerSvc: seerSvc,
+		chatSvc: chatSvc,
 	}
 }
 
@@ -108,4 +110,32 @@ func (s *horoOdrSvc) GetOrderHistoryByUserUUID(ctx context.Context, userUUID uui
 	}
 
 	return &order, nil
+}
+
+func (s *horoOdrSvc) UpdateOrderStatusConfirmedByUUID(ctx context.Context, status entity.HoroOrderStatus, orderUUID uuid.UUID, seerUUID uuid.UUID) error {
+
+	return s.tx.WithinTransaction(ctx, func(tx context.Context) error {
+		order := &entity.Order{}
+		if err := s.repo.GetOrderByUUID(tx, order, orderUUID); err != nil {
+			return err
+		}
+
+		if err := s.repo.UpdateOrderStatusByUUID(tx, status, orderUUID); err != nil {
+			return err
+		}
+
+		return s.chatSvc.CreateChatRoom(
+			tx,
+			orderUUID,
+			order.UserUUID,
+			seerUUID,
+			order.StartTime,
+			order.EndTime,
+		)
+	})
+}
+
+func (s *horoOdrSvc) UpdateOrderStatusSuccessByUUID(ctx context.Context, status entity.HoroOrderStatus, orderUUID uuid.UUID) error {
+
+	return s.repo.UpdateOrderStatusByUUID(ctx, status, orderUUID)
 }

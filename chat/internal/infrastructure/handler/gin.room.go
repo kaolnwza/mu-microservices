@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -21,6 +22,7 @@ func NewRoomHandler(wsRoom port.WSRoom, roomSvc port.RoomService) *roomHdr {
 
 func (h *roomHdr) JoinRoomHandler(c port.Context) {
 	userUUID := c.AccessUserUUID()
+	fmt.Println("useruuid ", userUUID)
 	roomUUIDs := c.Param("room_uuid")
 	roomUUID, err := uuid.Parse(roomUUIDs)
 	if err != nil {

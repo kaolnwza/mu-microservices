@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/google/uuid"
+	entity "github.com/kaolnwza/muniverse/order/internal/application/core/entities"
 	port "github.com/kaolnwza/muniverse/order/internal/ports"
 	log "github.com/kaolnwza/muniverse/order/lib/logs"
 )
@@ -98,4 +100,60 @@ func (h *orderHdr) GetOrderHistoryByUserUUIDHandler(c port.Context) {
 	}
 
 	c.JSON(http.StatusOK, order)
+}
+
+func (h *orderHdr) UpdateOrderStatusConfirmedByUUIDHandler(c port.Context) {
+	seerUUID := c.AccessSeerUUID()
+	if seerUUID == uuid.Nil {
+		err := errors.New("role has no authorized")
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	seerUserUUID := c.AccessUserUUID()
+
+	orderUUID, err := uuid.Parse(c.Param("order_uuid"))
+	if err != nil {
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	status := entity.HORO_ORDER_STATUS_CONFIRMED
+	if err := h.svc.UpdateOrderStatusConfirmedByUUID(c.Ctx(), status, orderUUID, seerUserUUID); err != nil {
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+
+}
+
+func (h *orderHdr) UpdateOrderStatusSuccessByUUIDHandler(c port.Context) {
+	seerUUID := c.AccessSeerUUID()
+	if seerUUID == uuid.Nil {
+		err := errors.New("role has no authorized")
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	orderUUID, err := uuid.Parse(c.Param("order_uuid"))
+	if err != nil {
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	status := entity.HORO_ORDER_STATUS_SUCCESS
+	if err := h.svc.UpdateOrderStatusSuccessByUUID(c.Ctx(), status, orderUUID); err != nil {
+		log.Error(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+
 }

@@ -10,11 +10,13 @@ import (
 )
 
 type wsClient struct {
-	hub *entity.Hub
+	hub        *entity.Hub
+	roomMsgSvc port.RoomMessageService
+	pgTx       port.Transactor
 }
 
-func NewWSChatClient(hub *entity.Hub) port.WSChatClient {
-	return &wsClient{hub: hub}
+func NewWSChatClient(hub *entity.Hub, roomMsgSvc port.RoomMessageService, pgTx port.Transactor) port.WSChatClient {
+	return &wsClient{hub: hub, roomMsgSvc: roomMsgSvc, pgTx: pgTx}
 }
 
 func (c *wsClient) WritePump(cli *entity.Client) {

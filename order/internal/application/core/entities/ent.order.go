@@ -11,11 +11,17 @@ import (
 type HoroOrderStatus string
 
 const (
-	HORO_ORDER_STATUS_FAIL    HoroOrderStatus = "fail"
-	HORO_ORDER_STATUS_UNPAID  HoroOrderStatus = "unpaid"
-	HORO_ORDER_STATUS_PAID    HoroOrderStatus = "paid"
-	HORO_ORDER_STATUS_SUCCESS HoroOrderStatus = "success"
+	HORO_ORDER_STATUS_FAIL      HoroOrderStatus = "fail"
+	HORO_ORDER_STATUS_UNPAID    HoroOrderStatus = "unpaid"
+	HORO_ORDER_STATUS_PAID      HoroOrderStatus = "paid"
+	HORO_ORDER_STATUS_CONFIRMED HoroOrderStatus = "confirmed"
+	HORO_ORDER_STATUS_SUCCESS   HoroOrderStatus = "success"
 )
+
+var HoroOrderStatusMap = map[string]HoroOrderStatus{
+	"confirmed": HORO_ORDER_STATUS_CONFIRMED,
+	"success":   HORO_ORDER_STATUS_SUCCESS,
+}
 
 type Order struct {
 	UUID            uuid.UUID       `db:"uuid"`
@@ -33,6 +39,7 @@ type OrderCustomer struct {
 	UUID            uuid.UUID `db:"uuid" json:"uuid"`
 	UserUUID        uuid.UUID `db:"user_uuid" json:"user_uuid"`
 	HoroServiceUUID uuid.UUID `db:"horo_service_uuid" json:"horo_service_uuid"`
+	Status          string    `db:"status" json:"status"`
 	StartTime       time.Time `db:"start_time" json:"start_time"`
 	EndTime         time.Time `db:"end_time" json:"end_time"`
 }

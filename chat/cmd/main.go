@@ -32,12 +32,17 @@ func main() {
 
 	// cli := ws.NewClient()
 
-	wsHub := ws.NewWSHub()
-	wsCli := ws.NewWSChatClient(wsHub.Hub)
-	wsSrv := ws.NewWSChatServer(wsHub.Hub, *upgrader, wsCli)
+	roomMsgRepo := pg.NewRoomMessageRepository(pgTx)
+	roomMsgSvc := service.NewRoomMessageService(pgTx, roomMsgRepo)
+	roomMsgHdr := handler.NewRoomMessageHandler(roomMsgSvc)
 
 	roomRepo := pg.NewRoomRepository(pgTx)
 	roomSvc := service.NewRoomService(pgTx, roomRepo)
+
+	wsHub := ws.NewWSHub()
+	wsCli := ws.NewWSChatClient(wsHub.Hub, roomMsgSvc, pgTx)
+	wsSrv := ws.NewWSChatServer(wsHub.Hub, *upgrader, wsCli)
+
 	roomHdr := handler.NewRoomHandler(wsSrv, roomSvc)
 
 	rpcLisn, rpcSrv := rpcAdapter.NewGrpcServer()
@@ -59,7 +64,7 @@ func main() {
 				v1roomId.GET("/join", roomHdr.JoinRoomHandler)
 				v1roomMsg := v1roomId.GROUP("/messages")
 				{
-					_ = v1roomMsg
+					v1roomMsg.GET("/", roomMsgHdr.GetRoomMessageByRoomUUIDHandler)
 				}
 			}
 

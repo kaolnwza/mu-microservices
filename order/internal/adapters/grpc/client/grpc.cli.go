@@ -22,7 +22,11 @@ func NewWalletServiceClient() pb.WalletServiceClient {
 }
 
 func NewImageStorageServiceClient() pb.HoroSvcServiceClient {
-	return pb.NewHoroSvcServiceClient(grpcClientConn(os.Getenv("STORER_RPC_PORT"), "stoage", os.Getenv("STORAGE_DNS")))
+	return pb.NewHoroSvcServiceClient(grpcClientConn(os.Getenv("STORER_RPC_PORT"), "storage", os.Getenv("STORAGE_DNS")))
+}
+
+func NewChatServiceClient() pb.ChatServiceClient {
+	return pb.NewChatServiceClient(grpcClientConn(os.Getenv("CHAT_RPC_PORT"), "chat", os.Getenv("CHAT_DNS")))
 }
 
 func grpcClientConn(port string, srvName string, dns string) *grpc.ClientConn {

@@ -12,6 +12,7 @@ services:
       - voucher-service
       - auth-service
       - feed-service
+      - chat-service
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
@@ -142,6 +143,21 @@ services:
     env_file:
       - feed/.envrc
       - feed/deployment.env
+    networks:
+      - muniverse
+
+  chat-service:
+    container_name: chat-container
+    build:
+      context: ./chat
+      dockerfile: Dockerfile
+    ports:
+      - 8009:8009
+    volumes:
+      - .:/go/app
+    env_file:
+      - chat/.envrc
+      - chat/deployment.env
     networks:
       - muniverse
 

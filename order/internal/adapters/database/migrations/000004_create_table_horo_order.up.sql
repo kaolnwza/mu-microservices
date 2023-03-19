@@ -1,4 +1,4 @@
-create type horo_order_status as enum ('fail', 'unpaid', 'paid', 'cancel_by_user', 'cancel_by_seer', 'success', 'inprogress', 'refund');
+create type horo_order_status as enum ('fail', 'unpaid', 'paid', 'cancel_by_user', 'cancel_by_seer', 'success', 'inprogress', 'refund', 'confirmed');
 
 create table horo_order (
     uuid uuid not null primary key default uuid_generate_v4(), 

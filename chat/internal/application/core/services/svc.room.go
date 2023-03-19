@@ -18,8 +18,8 @@ func NewRoomService(tx port.Transactor, roomRepo port.RoomRepository) port.RoomS
 	return &roomSvc{tx: tx, roomRepo: roomRepo}
 }
 
-func (s *roomSvc) CreateRoom(ctx context.Context, stUserUUID uuid.UUID, ndUserUUID uuid.UUID, startTime string, endTime string) error {
-	if err := s.roomRepo.CreateRoom(ctx, stUserUUID, ndUserUUID, startTime, endTime); err != nil {
+func (s *roomSvc) CreateRoom(ctx context.Context, stUserUUID uuid.UUID, ndUserUUID uuid.UUID, startTime string, endTime string, orderUUID uuid.UUID) error {
+	if err := s.roomRepo.CreateRoom(ctx, stUserUUID, ndUserUUID, startTime, endTime, orderUUID); err != nil {
 		return err
 	}
 

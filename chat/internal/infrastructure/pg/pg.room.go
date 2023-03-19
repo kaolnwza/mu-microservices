@@ -16,21 +16,21 @@ func NewRoomRepository(tx port.Transactor) port.RoomRepository {
 	return &roomRepo{tx: tx}
 }
 
-func (r *roomRepo) CreateRoom(ctx context.Context, stUserUUID uuid.UUID, ndUserUUID uuid.UUID, startTime string, endTime string) error {
+func (r *roomRepo) CreateRoom(ctx context.Context, stUserUUID uuid.UUID, ndUserUUID uuid.UUID, startTime string, endTime string, orderUUID uuid.UUID) error {
 	query := `
 		WITH room_created AS (
-			INSERT INTO room (start_time, end_time)	
-			VALUES ($1, $2)
+			INSERT INTO room (start_time, end_time, horo_order_uuid)	
+			VALUES ($1, $2, $5)
 			RETURNING uuid
 		)
 
 		INSERT INTO room_user (room_uuid, user_uuid)
 		VALUES 
 			((SELECT uuid FROM room_created), $3),
-			((SELECT uuid FORM room_created), $4)
+			((SELECT uuid FROM room_created), $4)
 	`
 
-	return r.tx.Insert(ctx, query, startTime, endTime, stUserUUID, ndUserUUID)
+	return r.tx.Insert(ctx, query, startTime, endTime, stUserUUID, ndUserUUID, orderUUID)
 }
 
 func (r *roomRepo) GetRoomByUserUUID(ctx context.Context, dest *[]*entity.Room, userUUID uuid.UUID) error {
@@ -40,7 +40,15 @@ func (r *roomRepo) GetRoomByUserUUID(ctx context.Context, dest *[]*entity.Room, 
 			start_time,
 			end_time,
 			user_uuid AS "meeter_uuid",
-			created_at
+			status,
+			created_at,
+			(
+				SELECT message FROM room_message 
+				WHERE room_uuid = room.uuid
+				AND user_uuid != $1
+				ORDER BY created_at DESC
+				LIMIT 1
+			) AS last_message
 		FROM room
 		LEFT JOIN room_user ON room_uuid = room.uuid AND user_uuid != $1
 		WHERE EXISTS (
@@ -48,7 +56,7 @@ func (r *roomRepo) GetRoomByUserUUID(ctx context.Context, dest *[]*entity.Room, 
 			WHERE user_uuid = $1
 			AND room_uuid = room.uuid
 		)
-		AND now() < start_time
+		-- AND now() < start_time
 		AND status IS TRUE
 		ORDER BY created_at DESC
 	`

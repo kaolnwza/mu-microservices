@@ -38,6 +38,9 @@ func main() {
 	imgConn := grpcClient.NewImageStorageServiceClient()
 	imgCli := rpc.NewImageStorageServiceClient(imgConn)
 
+	chatConn := grpcClient.NewChatServiceClient()
+	chatCli := rpc.NewChatServiceClient(chatConn)
+
 	// storerConn := grpcClient.NewStorageServiceClient()
 	// storerCli := rpc.NewGrpcStorerClient(storerConn)
 	// // imgStorerConn := grpcClient.NewProfileServiceClient()
@@ -48,7 +51,7 @@ func main() {
 	horoHdr := handler.NewHoroHandler(horoSvc)
 
 	orderRepo := postgres.NewHoroOrderRepository(pgTx)
-	orderSvc := service.NewHoroOrderService(pgTx, orderRepo, voucherCli, walletCli, horoSvc, seerCli)
+	orderSvc := service.NewHoroOrderService(pgTx, orderRepo, voucherCli, walletCli, horoSvc, seerCli, chatCli)
 	orderHdr := handler.NewHoroOrderHandler(orderSvc)
 
 	r := ginapi.NewGinRouter()
@@ -60,6 +63,8 @@ func main() {
 			v1odr_id := v1odr.GROUP("/:order_uuid")
 			{
 				v1odr_id.POST("/", orderHdr.CreateNewHoroOrderHandler)
+				v1odr_id.PATCH("/confirmed", orderHdr.UpdateOrderStatusConfirmedByUUIDHandler)
+				v1odr_id.PATCH("/success", orderHdr.UpdateOrderStatusSuccessByUUIDHandler)
 			}
 
 			v1odr_user := v1odr.GROUP("/users")

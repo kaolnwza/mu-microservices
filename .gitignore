@@ -1,0 +1,5 @@
+*/credentials
+*/lib/credentials
+*/.envrc
+*/deployment.env
+*/.env

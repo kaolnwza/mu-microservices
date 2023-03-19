@@ -21,19 +21,24 @@ func NewGrpcChatServer(roomSvc port.RoomService) pb.ChatServiceServer {
 func (r *rpcChatServer) CreateChat(ctx context.Context, req *pb.CreateChatRequest) (*emptypb.Empty, error) {
 	stUserUUID, err := uuid.Parse(req.StUserUuid)
 	if err != nil {
-		return nil, err
+		return &emptypb.Empty{}, err
 	}
 
 	ndUserUUID, err := uuid.Parse(req.NdUserUuid)
 	if err != nil {
-		return nil, err
+		return &emptypb.Empty{}, err
 	}
 
-	if err := r.roomSvc.CreateRoom(ctx, stUserUUID, ndUserUUID, req.StartTime, req.EndTime); err != nil {
-		return nil, err
+	orderUUID, err := uuid.Parse(req.OrderUuid)
+	if err != nil {
+		return &emptypb.Empty{}, err
 	}
 
-	return nil, nil
+	if err := r.roomSvc.CreateRoom(ctx, stUserUUID, ndUserUUID, req.StartTime, req.EndTime, orderUUID); err != nil {
+		return &emptypb.Empty{}, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
 func (r *rpcChatServer) UpdateChatRoomStatus(ctx context.Context, req *pb.ChatRoomStatusRequest) (*emptypb.Empty, error) {

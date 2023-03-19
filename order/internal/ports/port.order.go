@@ -13,6 +13,8 @@ type HoroOrderRepository interface {
 	GetCustomerOrderHistory(ctx context.Context, dest *[]*entity.OrderCustomer, seerUUID uuid.UUID) error
 	GetOrderByUserUUID(ctx context.Context, dest *[]*entity.OrderCustomer, userUUID uuid.UUID) error
 	GetOrderHistoryByUserUUID(ctx context.Context, dest *[]*entity.OrderCustomer, userUUID uuid.UUID) error
+	UpdateOrderStatusByUUID(ctx context.Context, status entity.HoroOrderStatus, orderUUID uuid.UUID) error
+	GetOrderByUUID(ctx context.Context, dest *entity.Order, orderUUID uuid.UUID) error
 }
 
 type HoroOrderService interface {
@@ -21,4 +23,7 @@ type HoroOrderService interface {
 	GetCustomerOrderHistory(ctx context.Context, seerUUID uuid.UUID) (*[]*entity.OrderCustomer, error)
 	GetOrderByUserUUID(ctx context.Context, userUUID uuid.UUID) (*[]*entity.OrderCustomer, error)
 	GetOrderHistoryByUserUUID(ctx context.Context, userUUID uuid.UUID) (*[]*entity.OrderCustomer, error)
+	UpdateOrderStatusSuccessByUUID(ctx context.Context, status entity.HoroOrderStatus, orderUUID uuid.UUID) error
+	UpdateOrderStatusConfirmedByUUID(ctx context.Context, status entity.HoroOrderStatus, orderUUID uuid.UUID, seerUUID uuid.UUID) error
+	// GetOrderByUUID(ctx context.Context, orderUUID uuid.UUID) (*entity.OrderCustomer, error)
 }

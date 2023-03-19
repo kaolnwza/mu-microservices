@@ -31,6 +31,7 @@ func (h *horoOdrRepo) GetUpcomingCustomerOrder(ctx context.Context, dest *[]*ent
 			uuid,
 			user_uuid,
 			horo_service_uuid,
+			status,
 			start_time,
 			end_time
 		FROM horo_order
@@ -40,7 +41,7 @@ func (h *horoOdrRepo) GetUpcomingCustomerOrder(ctx context.Context, dest *[]*ent
 			WHERE horo_service.uuid = horo_order.horo_service_uuid
 			AND seer_uuid = $1
 		)
-		AND status IN ('inprogress')
+		AND status IN ('paid', 'confirmed')
 	`
 
 	return h.tx.Get(ctx, dest, query, seerUUID)
@@ -52,6 +53,7 @@ func (h *horoOdrRepo) GetCustomerOrderHistory(ctx context.Context, dest *[]*enti
 			uuid,
 			user_uuid,
 			horo_service_uuid,
+			status,
 			start_time,
 			end_time
 		FROM horo_order
@@ -73,10 +75,11 @@ func (h *horoOdrRepo) GetOrderByUserUUID(ctx context.Context, dest *[]*entity.Or
 			uuid,
 			user_uuid,
 			horo_service_uuid,
+			status,
 			start_time,
 			end_time
 		FROM horo_order
-		WHERE status IN ('inprogress')
+		WHERE status IN ('paid', 'confirmed')
 		AND user_uuid = $1
 	`
 
@@ -89,6 +92,7 @@ func (h *horoOdrRepo) GetOrderHistoryByUserUUID(ctx context.Context, dest *[]*en
 			uuid,
 			user_uuid,
 			horo_service_uuid,
+			status,
 			start_time,
 			end_time
 		FROM horo_order
@@ -97,4 +101,30 @@ func (h *horoOdrRepo) GetOrderHistoryByUserUUID(ctx context.Context, dest *[]*en
 	`
 
 	return h.tx.Get(ctx, dest, query, userUUID)
+}
+
+func (h *horoOdrRepo) UpdateOrderStatusByUUID(ctx context.Context, status entity.HoroOrderStatus, horoUUID uuid.UUID) error {
+	query := `
+		UPDATE horo_order
+		SET status = $1
+		WHERE uuid = $2
+	`
+
+	return h.tx.Update(ctx, query, status, horoUUID)
+}
+
+func (h *horoOdrRepo) GetOrderByUUID(ctx context.Context, dest *entity.Order, orderUUID uuid.UUID) error {
+	query := `
+		SELECT
+			uuid,
+			user_uuid,
+			horo_service_uuid,
+			status,
+			start_time,
+			end_time
+		FROM horo_order
+		WHERE uuid = $1
+	`
+
+	return h.tx.GetOne(ctx, dest, query, orderUUID)
 }
